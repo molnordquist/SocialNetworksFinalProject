@@ -1,0 +1,71 @@
+source,target,weight
+Katniss,Peeta,9
+Katniss,Haymitch,4
+Katniss,Effie,2
+Katniss,Gale,2
+Katniss,seneca Crane,1
+Katniss,Pres Snow,3
+Katniss,Mrs. Everdeen,1
+Katniss,Cinna,1
+Katniss,Thresh,1
+Katniss,Rue,2
+Katniss,Prim,3
+Katniss,Brutus,1
+Katniss,Enobaria,1
+Katniss,Wirus,1
+Katniss,Beetee,1
+Katniss,Finnick,2
+Katniss,Mags,2
+Katniss,Annie,1
+Peeta,Katniss,3
+Peeta,Haymitch,1
+Peeta,Effie,1
+Peeta,Thresh,1
+Peeta,Rue,1
+Peeta,Prim,1
+Peeta,Finnick,1
+Peeta,Johanna,1
+Haymitch,Katniss,2
+Haymitch,Peeta,3
+Haymitch,Effie,1
+Haymitch,Pres Snow,2
+Haymitch,cashmere,1
+Haymitch,Gloss,1
+Haymitch,Brutus,1
+Haymitch,Enobaria,1
+Haymitch,Wirus,1
+Haymitch,Beetee,1
+Haymitch,Finnick,1
+Haymitch,Mags,1
+Haymitch,Johanna,1
+Effie,seneca Crane,1
+Effie,Cinna,1
+Effie,Thresh,1
+Effie,Rue,1
+Gale,Peeta,1
+Gale,Pres Snow,1
+Gale,Mrs. Everdeen,1
+Gale,Prim,1
+Pres Snow,Katniss,5
+Pres Snow,Peeta,3
+Pres Snow,seneca Crane,1
+Pres Snow,Mrs. Everdeen,1
+Ceasar Flickerman,Katniss,3
+Ceasar Flickerman,Peeta,3
+Ceasar Flickerman,Cinna,1
+Prim,Mrs. Everdeen,1
+Plutarch,Katniss,3
+Plutarch,seneca Crane,1
+Beetee,Wirus,1
+Beetee,Finnick,1
+Beetee,Johanna,1
+Finnick,Katniss,1
+Finnick,Peeta,2
+Finnick,Haymitch,1
+Finnick,Mags,3
+Finnick,Annie,1
+Johanna,Pres Snow,2
+Johanna,Wirus,1
+Johanna,Beetee,1
+Johanna,Mags,1
+Johanna,Annie,1
