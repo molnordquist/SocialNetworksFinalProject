@@ -70,8 +70,8 @@ server <- function(input, output) {
   # CARD 2 
   
 network <- reactive({
-  data_nodes <-  read.csv("~/Desktop/Spring26/Social Networks/Data/Hungergames_nodes.csv")
-  data_edges <-  read.csv("~/Desktop/Spring26/Social Networks/Data/Hungergames_edges (3).csv")
+  data_nodes <-  read.csv("Hungergames_nodes.csv")
+  data_edges <-  read.csv("Hungergames_edges (3).csv")
   
   data_edges <- data_edges |>
     rename(from = source, to = target)
@@ -106,8 +106,8 @@ output$characters_net <- renderPlot({
 # we're going to use another example network like from above but visNetwork requires separate edge and nodes lists 
 
 network2 <- reactive({
-  data_nodes <-  read.csv("~/Desktop/Spring26/Social Networks/Data/Hungergames_nodes.csv")
-  data_edges <-  read.csv("~/Desktop/Spring26/Social Networks/Data/Hungergames_edges (3).csv")
+  data_nodes <-  read.csv("Hungergames_nodes.csv")
+  data_edges <-  read.csv("Hungergames_edges (3).csv")
   
   data_edges <- data_edges |>
     rename(from = source, to = target)
