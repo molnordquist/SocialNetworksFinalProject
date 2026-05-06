@@ -9,6 +9,7 @@ library(igraph)
 library(tidygraph)
 library(ggraph)
 
+library(ggrepel)
 library(visNetwork)
 
 # Section 2. Design the site in the UI section (US = User Interface). This is where we define how everything looks and 
@@ -204,7 +205,7 @@ output$degree_scatter <- renderPlot({
       geom_edge_link(aes(width = weight), alpha = 0.3) +
       scale_edge_width(range = c(0.1, 3)) +
       geom_node_point(aes(color = District, size = betweenness)) +
-      geom_node_text(aes(label = Characters), repel = TRUE, size = 4) +
+      geom_node_text(aes(label = Characters), size = 4)+
       theme_void() +
       labs(title = paste("Betweenness Centrality Without", input$remove_char),
            color = "District",
