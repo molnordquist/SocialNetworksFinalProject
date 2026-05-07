@@ -67,12 +67,35 @@ ui <-fluidPage(
               card(
                 card_header("In-Degree vs Out-Degree"),
                 plotOutput("degree_scatter"),
-                height = "600px"
+                height = "900px", 
+                "The y-axis represents the in-degree aka of how much a character is 
+                talked about by others. So the higher up on the y-axis, the more a 
+                character is talked about. The x-axis represents out-degree, so how 
+                much a character talks about other characters. So the farther right a
+                character is the more frequently they mention other characters. Characters 
+                in the top right talk about others a lot and are talked about a lot. Characters 
+                in the bottom left don't talk about others and don't get talked about much. From 
+                this we can conclude that Katniss is the most talked about character and talks 
+                about other characters the most, which makes sense since she is the main character 
+                and the story follows her. Peeta is a character who is talked about frequently by 
+                other characters, as he is all the way at the top of the in-degree metric, but isn't 
+                referenced more than Haymitch or Katniss, as he is about halfway across the out-degree
+                axis. Someone like Haymitch would be a very influential character because his out-degree 
+                is proportionally larger than in-degree, meaning he is spreading a lot of information, 
+                but maybe he is more on the down low about his information spread. An interesting observation 
+                is President Snow talks about others far more frequently than he is talked about, which suggests 
+                he doesn't have as much influence over Panem as he believes he does. This could foreshadow rebellion."
               ),
               card(
                 card_header("In vs Out Degree by District"),
                 plotOutput("district_degree"),
-                height = "500px"
+                height = "700px",
+                "District 12 talks about others slightly more than they are talked about. 
+                The Capitol is talked about slightly more than they talk about others. Then 
+                there are districts like districts 3 and 4 that are talked about way more frequently 
+                than they talk about other districts. It is important to note that this could be due 
+                to screen time. So since the main characters are from district 12, their out-degree 
+                will be very high because they are frequently conversating on screen about others."
               )
     ),
     
@@ -89,7 +112,22 @@ ui <-fluidPage(
                             verbatimTextOutput("katniss_stats"))
                 ),
                 height = "600px"
-              )
+              ),
+              nav_panel("President Snow Analysis",
+                        card(
+                          card_header("Compare President Snow"),
+                          selectInput("compare_snow",
+                                      "Compare President Snow to:",
+                                      choices = NULL),
+                          navset_tab(
+                            nav_panel("In vs Out Degree",
+                                      plotOutput("snow_degree")),
+                            nav_panel("Centrality Summary",
+                                      verbatimTextOutput("snow_stats"))
+                          ),
+                          height = "600px"
+                        )
+              ),
     ),
     
   )
@@ -274,7 +312,54 @@ output$degree_scatter <- renderPlot({
   })
 # we're going to use another example network like from above but visNetwork requires separate edge and nodes lists 
 #card6
-
+  observe({
+    char_names <- network() |>
+      activate(nodes) |>
+      as_tibble() |>
+      filter(Characters != "Pres Snow") |>
+      pull(Characters)
+    
+    updateSelectInput(inputId = "compare_snow",
+                      choices  = char_names,
+                      selected = "Katniss")
+  })
+  
+  output$snow_degree <- renderPlot({
+    characters_df <- network() |>
+      activate(nodes) |>
+      as_tibble() |>
+      filter(Characters %in% c("Pres Snow", input$compare_snow)) |>
+      select(Characters, indegree, outdegree) |>
+      pivot_longer(cols      = c(indegree, outdegree),
+                   names_to  = "type",
+                   values_to = "value")
+    
+    ggplot(characters_df, aes(x    = type,
+                              y    = value,
+                              fill = Characters)) +
+      geom_col(position = "dodge", width = 0.5) +
+      theme_minimal() +
+      labs(x     = "Degree Type",
+           y     = "Value",
+           fill  = "Character",
+           title = paste("President Snow vs", input$compare_snow, ": In vs Out Degree"))
+  })
+  
+  output$snow_stats <- renderPrint({
+    characters_df <- network() |>
+      activate(nodes) |>
+      as_tibble() |>
+      filter(Characters %in% c("Pres Snow", input$compare_snow)) |>
+      select(Characters, indegree, outdegree, betweenness)
+    
+    for (i in 1:nrow(characters_df)) {
+      cat("Character:             ", characters_df$Characters[i], "\n")
+      cat("In-Degree:             ", characters_df$indegree[i], "\n")
+      cat("Out-Degree:            ", characters_df$outdegree[i], "\n")
+      cat("Betweenness Centrality:", round(characters_df$betweenness[i], 4), "\n")
+      cat("-----------------------------------\n")
+    }
+  })
 }
 
 # Run the application 
