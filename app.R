@@ -24,90 +24,77 @@ ui <-fluidPage(
     base_font = font_google("Crimson Text")  
   ),
   
-  titlePanel(
-    div(style = "color: #c41e3a; font-weight: bold;",
-        "'Hunger Games: Catching Fire' Rebellion Influence Network")
-  ),
-  
-  page_sidebar(
-    sidebar = sidebar(
-      title = "Explore the Network",
-      bg    = "#16213e",
-      "Analyze rebellion influence and gossip structure 
-       among characters in Catching Fire."
-    ),
-    #card1
-    card(
-      card_header("Introduction"), 
-      "This project is focused on gossip network in the Hunger Games movie Catching Fire. 
-      This network is described to have connections between characters when characters refrence eachother in conversation. 
-      The goal of this project is to analyze who is talked about the most, who is a leading force in rebellion, whose characters are being focused on,etc. "),
+  navlistPanel(
+    widths = c(2, 10),  # sidebar width vs content width
+    well   = TRUE,
     
-    #card2 network colored by attribute
-    card(card_header("Here's a simple network of relations based on attributes of characters"),
-         selectInput("color",
-                     "choose characteristic of the network for nodes", 
-                     choices = list("Gender" = "gender", 
-                                    "District" = "District"), 
-                     selected = 1), 
-         plotOutput("characters_net"), height = "600px"),
-    
-    #card3 In and out degree network
-    card(
-      card_header("In-Degree vs Out-Degree"),
-      plotOutput("degree_scatter"),
-      height = "800px", 
-      "The y-axis represents the in-degree aka of how much a character is talked about by others. 
-      So the higher up on the y-axis, the more a character is talked about. The x-axis represents out-degree, 
-      so how much a character talks about other characters. So the farther rigth a hcracater is
-      the more frequenlty they mention other characters. Characters in 
-      the top right talk about others a lot and are talked about a lot.
-      Characters in the bottom left don't talk about others and don't get talked about much.
-      From this we can conclude that Katniss is the most talked about character and talks about other 
-      chracaters the most, which makes sense since she is teh main character and the story follows her.Peeta
-      is a character who is talked about frequently by other characters, as he is all the way at the top of the
-      in-degree metric, but isn't refrened more then Haymitch aor Katniss, as he is about halfway across the out-degree axis. 
-      Someone like Haymitch would be a very influential character because his out-degree is proportionally larger then in-degree, 
-      meaning he is spreading a lot of information, but maybe he is more on the down low about his information spread. An interesting 
-      observation is president snow talks about others far more frequrnlty then he is talked about. Which suggest he doesn't have as 
-      much influence over Panem then he belives he does. This could foreshadow rebellion. ",
-    ),
-    #card4 w character removal
-    card(
-      card_header("Network With Character Removed"),
-      "Remove a character to see how the network changes without them.",
-      selectInput("remove_char",
-                  "Select character to remove:",
-                  choices = NULL),   # we fill this from the server
-      plotOutput("no_char_net"),
-      height = "500px"
+    # ── sidebar nav items ──────────────────────────────────────
+    nav_panel("Introduction",
+              div(style = "color: #c41e3a; font-weight: bold; font-size: 28px; padding: 20px 0px;",
+                  "'Hunger Games: Catching Fire' Rebellion Influence Network"),
+              card(
+                card_header("About This Project"),
+                "This project is focused on the gossip network in Catching Fire.
+                 Connections exist between characters when they reference each other
+                 in conversation. The goal is to analyze who is talked about the most,
+                 who is a leading force in rebellion, and who holds the most influence.
+                The attributes between each character includes district characters are from and gender. 
+                Districts can give insight into power dynamics and information spread."
+              ),
+              card(
+                card_header("Character Network"),
+                selectInput("color",
+                            "Color nodes by:",
+                            choices = list("Gender"   = "gender",
+                                           "District" = "District"),
+                            selected = "gender"),
+                plotOutput("characters_net"),
+                height = "600px"
+              ),
+              card(
+                card_header("Network With Character Removed"),
+                selectInput("remove_char",
+                            "Select character to remove:",
+                            choices = NULL),
+                plotOutput("no_char_net"),
+                height = "500px"
+              )
     ),
     
-    #card5
-    card(
-      card_header("In vs Out Degree by District"),
-      "Which districts are being talked about vs which are driving the conversation?",
-      plotOutput("district_degree"),
-      height = "500px", 
-      "District 12 talks about others slightly more then they are talked about. The capital is 
-      talked about slightly more then they talk about others. Then there are districts like districts 3 
-      and 4 that are talked about way more frequntly then they talk about other districts. It is important 
-      to note that this could be due to screen time. So since the main characters are from district 12, their out-degree 
-      will be very high because they are ferquenlty conversating on screen about others. "
+    
+    
+    nav_panel("Degree Analysis",
+              card(
+                card_header("In-Degree vs Out-Degree"),
+                plotOutput("degree_scatter"),
+                height = "600px"
+              ),
+              card(
+                card_header("In vs Out Degree by District"),
+                plotOutput("district_degree"),
+                height = "500px"
+              )
     ),
     
-    #card6 vis network
-    card(card_header("Degree Centrality by Character"), 
-         "we can use the package VisNetwork to make it happen", 
-         radioButtons("size_by", "Centrality Measure", 
-                      choices = c("Degree" = "degree", 
-                      "Betweenness Centrality" = "betweenness"), 
-         selected = "degree"),
-         visNetworkOutput("int_network"), height = "600px")
-    )
+    nav_panel("Character Comparison",
+              card(
+                card_header("Compare Characters"),
+                selectInput("compare_char",
+                            "Compare Katniss to:",
+                            choices = NULL),
+                navset_tab(
+                  nav_panel("In vs Out Degree",
+                            plotOutput("katniss_degree")),
+                  nav_panel("Centrality Summary",
+                            verbatimTextOutput("katniss_stats"))
+                ),
+                height = "600px"
+              )
+    ),
+    
   )
-
-
+)
+    
 # Section 2. The server section defines how our app works. Here's where we will put all the network analysis. 
 
 server <- function(input, output) {
@@ -237,44 +224,56 @@ output$degree_scatter <- renderPlot({
            title = "In vs Out Degree by District")
   })
   
-# we're going to use another example network like from above but visNetwork requires separate edge and nodes lists 
-#card6
-  output$int_network <- renderVisNetwork({
-    characters_net <- network()
-    
-    nodes_df <- characters_net |>
+  observe({
+    char_names <- network() |>
       activate(nodes) |>
       as_tibble() |>
-      rowid_to_column("id") |>
-      mutate(label = Characters,
-             value = if_else(input$size_by == "degree", degree, betweenness))
+      filter(Characters != "Katniss") |>
+      pull(Characters)
     
-    edges_df <- characters_net |>
-      activate(edges) |>
-      as_tibble() 
+    updateSelectInput(inputId = "compare_char",
+                      choices  = char_names,
+                      selected = "Peeta")
+  })
+  
+  output$katniss_degree <- renderPlot({
+    characters_df <- network() |>
+      activate(nodes) |>
+      as_tibble() |>
+      filter(Characters %in% c("Katniss", input$compare_char)) |>
+      select(Characters, indegree, outdegree) |>
+      pivot_longer(cols      = c(indegree, outdegree),
+                   names_to  = "type",
+                   values_to = "value")
     
-    visNetwork(nodes_df, edges_df) |>
-    visNodes(borderWidth = 1, 
-             color = list(
-               background= "pink", 
-               border = "red", 
-               highlight =  "purple"))|>
+    ggplot(characters_df, aes(x    = type,
+                              y    = value,
+                              fill = Characters)) +
+      geom_col(position = "dodge", width = 0.5) +
+      theme_minimal() +
+      labs(x     = "Degree Type",
+           y     = "Value",
+           fill  = "Character",
+           title = paste("Katniss vs", input$compare_char, ": In vs Out Degree"))
+  })
+  #card 6
+  output$katniss_stats <- renderPrint({
+    characters_df <- network() |>
+      activate(nodes) |>
+      as_tibble() |>
+      filter(Characters %in% c("Katniss", input$compare_char)) |>
+      select(Characters, indegree, outdegree, betweenness)
     
-    visEdges(
-      color = list(color = "purple", highlight = "black")) |> 
-    
-    visOptions(
-      highlightNearest = list(enabled = TRUE, hover = TRUE), 
-      nodesIdSelection = FALSE) |>
-    
-    visInteraction(
-      dragNodes = TRUE, 
-      dragView = TRUE, 
-      zoomView = TRUE) |> 
-    
-    visPhysics(stabilization = TRUE)
-    
-})
+    for (i in 1:nrow(characters_df)) {
+      cat("Character:             ", characters_df$Characters[i], "\n")
+      cat("In-Degree:             ", characters_df$indegree[i], "\n")
+      cat("Out-Degree:            ", characters_df$outdegree[i], "\n")
+      cat("Betweenness Centrality:", round(characters_df$betweenness[i], 4), "\n")
+      cat("-----------------------------------\n")
+    }
+  })
+# we're going to use another example network like from above but visNetwork requires separate edge and nodes lists 
+#card6
 
 }
 
