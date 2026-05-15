@@ -1,4 +1,5 @@
 # Shiny App 
+# Molly Nordquist
 # Section 1. First install and activate all your required packages. 
 
 library(shiny)
@@ -36,22 +37,35 @@ ui <-fluidPage(
                 card_header("About This Project"),
                 "This project is focused on the gossip network in Catching Fire.
                  Connections exist between characters when they reference each other
-                 in conversation. The goal is to analyze who is talked about the most,
-                 who is a leading force in rebellion, and who holds the most influence.
-                The attributes between each character includes district characters are from and gender. 
-                Districts can give insight into power dynamics and information spread."
+                 in conversation. The goal is to analyze who is talked about the most, in the movie to be able to determine which characters are most central to conversations about rebellion and information flow, and who holds the most influence.Centrality measures and in-degree/out-degree
+                 measures will be used to allow users to make insights to what they see to be as powerful/influential in rebellion  
+                The attributes between each character includes district characters are from, role they have in movie, such as tribute, president, family, etc, and gender. 
+                Districts can give insight into power dynamics and information spread.", 
+                card_header("Nodes and edges"), 
+                "Nodes are defined to be characters mentioned by other characters in conversation.", br(),  
+                "Edges are defined to be references within conversation to the other character." , br(),  
+                "Edge weight was found by adding one when Character A references Character B in conversation on screen.", br(), 
+                "Node attributes include district that a character belongs to, meaning where they live, along with gender of character, and role in movie." , br(), 
+                "This is a weighted, directed network.", 
+                card_header("Before jumping into the website, here are some facts to keep in mind:", br(), 
+                            "Katniss is the main character of this story. She lives in District 12. The capitol is where the president 
+                            lives and all the upperclass citizens. The Hunger games is hosted by the capitol where the tributes for the 
+                            games are from the 12 districts.", br(),
+                            "Now, look at basic network visuals below and play around with the attributes and connections!")
               ),
               card(
                 card_header("Character Network"),
                 selectInput("color",
                             "Color nodes by:",
                             choices = list("Gender"   = "gender",
-                                           "District" = "District"),
+                                           "District" = "District", 
+                                           "Role in movie" = "Role"),
                             selected = "gender"),
                 plotOutput("characters_net"),
                 height = "600px"
               ),
               card(
+                card_header("Try removing characters to see if this changes the networks!"),
                 card_header("Network With Character Removed"),
                 selectInput("remove_char",
                             "Select character to remove:",
@@ -65,15 +79,17 @@ ui <-fluidPage(
     
     nav_panel("Degree Analysis",
               card(
+                card_header("Quick Defn! ", br(), "In-Degree represents a character getting talked about in a scene, out-degree means a character talking about another character in scene."),
                 card_header("In-Degree vs Out-Degree"),
                 plotOutput("degree_scatter"),
                 height = "900px", 
-                "The y-axis represents the in-degree aka of how much a character is 
+                "Possible takeaways: 
+                The y-axis represents the in-degree aka of how much a character is 
                 talked about by others. So the higher up on the y-axis, the more a 
                 character is talked about. The x-axis represents out-degree, so how 
                 much a character talks about other characters. So the farther right a
-                character is the more frequently they mention other characters. Characters 
-                in the top right talk about others a lot and are talked about a lot. Characters 
+                character is the more frequently they mention other characters.", br(),
+                "Characters in the top right talk about others a lot and are talked about a lot. Characters 
                 in the bottom left don't talk about others and don't get talked about much. From 
                 this we can conclude that Katniss is the most talked about character and talks 
                 about other characters the most, which makes sense since she is the main character 
@@ -83,8 +99,8 @@ ui <-fluidPage(
                 axis. Someone like Haymitch would be a very influential character because his out-degree 
                 is proportionally larger than in-degree, meaning he is spreading a lot of information, 
                 but maybe he is more on the down low about his information spread. An interesting observation 
-                is President Snow talks about others far more frequently than he is talked about, which suggests 
-                he doesn't have as much influence over Panem as he believes he does. This could foreshadow rebellion."
+                is President Snow is talked about more then he talks about others, but the amount he is talked about is less than Peeta and Katniss,
+                as well as the same amount as characters such as Finnick or Mags or Wirus. Therefore suggesting Snow may be less central to information flow then expected, despite having political authority over Panem."
               ),
               card(
                 card_header("In vs Out Degree by District"),
@@ -101,9 +117,12 @@ ui <-fluidPage(
     
     nav_panel("Character Comparison",
               card(
+                card_header("Some more quick defns!", br(), 
+                           "Betweeness Centrality measures how often a character is on the shortest paths connecting other characters, meaning they act as though they are a bridge to information flow.", br(),
+                           "Closeness Centrality is measured by taking 1 and dividing it by sum of distances. A high closeness centrality means a character is close to other characters in the network so they can therefore spread or retreive information very efficiently. Closer to 0 means a low closeness, so a character is more isolated."),
                 card_header("Compare Characters"),
                 selectInput("compare_char",
-                            "Compare Katniss to:",
+                            "Compare Katniss' centrality measures to:",
                             choices = NULL),
                 navset_tab(
                   nav_panel("In vs Out Degree",
@@ -111,11 +130,11 @@ ui <-fluidPage(
                   nav_panel("Centrality Summary",
                             verbatimTextOutput("katniss_stats"))
                 ),
-                height = "600px"
+                height = "800px"
               ),
               nav_panel("President Snow Analysis",
                         card(
-                          card_header("Compare President Snow"),
+                          card_header("Compare President Snow's centrality measures to"),
                           selectInput("compare_snow",
                                       "Compare President Snow to:",
                                       choices = NULL),
@@ -125,14 +144,41 @@ ui <-fluidPage(
                             nav_panel("Centrality Summary",
                                       verbatimTextOutput("snow_stats"))
                           ),
-                          height = "600px"
+                          height = "700px"
                         )
               ),
     ),
     
   )
 )
-    
+#getting background of graphs match the app background
+graph_theme <- theme(
+  plot.background = element_rect(fill = "#1a1a2e", color = NA),
+  panel.background = element_rect(fill = "#1a1a2e", color = NA),
+  legend.background = element_rect(fill = "#1a1a2e", color = NA),
+  legend.key = element_rect(fill = "#1a1a2e", color = NA),
+  panel.grid = element_blank(),
+  axis.text = element_blank(),
+  axis.title = element_blank(),
+  axis.ticks = element_blank(),
+  text = element_text(color = "#e0e0e0"),
+  plot.title = element_text(color = "#e0e0e0", face = "bold"),
+  legend.text = element_text(color = "#e0e0e0"),
+  legend.title = element_text(color = "#e0e0e0")
+)
+
+chart_theme <- theme(
+  plot.background = element_rect(fill = "#1a1a2e", color = NA),
+  panel.background = element_rect(fill = "#1a1a2e", color = NA),
+  legend.background = element_rect(fill = "#1a1a2e", color = NA),
+  legend.key = element_rect(fill = "#1a1a2e", color = NA),
+  text = element_text(color = "#e0e0e0"),
+  axis.text = element_text(color = "#e0e0e0"),
+  axis.title = element_text(color = "#e0e0e0"),
+  plot.title = element_text(color = "#e0e0e0", face = "bold"),
+  legend.text = element_text(color = "#e0e0e0"),
+  legend.title = element_text(color = "#e0e0e0")
+)
 # Section 2. The server section defines how our app works. Here's where we will put all the network analysis. 
 
 server <- function(input, output) {
@@ -143,7 +189,7 @@ server <- function(input, output) {
     paste("Our selected option is", input$select)
   })
   
-# let's create a simple example network with 10 nodes and calulate the degree centrality
+
 
   # CARD 2 
   
@@ -164,7 +210,8 @@ network <- reactive({
     mutate(degree      = centrality_degree(loops = TRUE),
            indegree    = centrality_degree(mode = "in"),
            outdegree   = centrality_degree(mode = "out"),
-           betweenness = centrality_betweenness(normalized = TRUE))
+           betweenness = centrality_betweenness(normalized = TRUE), 
+           closeness = centrality_closeness(normalized = TRUE))
   
   characters_net
   })
@@ -177,11 +224,12 @@ output$characters_net <- renderPlot({
   characters_net <- network() 
   
   p <- ggraph(characters_net, layout = "auto") +
-    geom_edge_link(aes(width = weight), alpha = 0.3) + 
+    geom_edge_link(aes(width = weight), color = "white", alpha = 0.3) + 
     scale_edge_width(range = c(0.1, 3)) + 
     geom_node_point(aes(color = .data[[input$color]]), size = 5) + 
-    geom_node_text(aes(label = Characters), color = "black") + 
+    geom_node_text(aes(label = Characters), color = "lightblue") + 
     theme_void() + 
+    graph_theme +
     theme(legend.position = "none")
   
   p
@@ -198,8 +246,9 @@ output$degree_scatter <- renderPlot({
                             color = Characters,
                             label = Characters)) +
     geom_point(size = 4) +
-    geom_text_repel(aes(label = Characters), size = 4, color = "black") +
+    geom_text_repel(aes(label = Characters), size = 4, color = "#e0e0e0") +
     theme_minimal() +
+    chart_theme + 
     labs(x     = "Out-Degree (Character talks about others)",
          y     = "In-Degree (Character is talked about by others)",
          color = "Character",
@@ -227,11 +276,12 @@ output$degree_scatter <- renderPlot({
       filter(Characters != input$remove_char) |>
       mutate(betweenness = centrality_betweenness()) |>
       ggraph(layout = "auto") +
-      geom_edge_link(aes(width = weight), alpha = 0.3) +
+      geom_edge_link(aes(width = weight), color="white", alpha = 0.3) +
       scale_edge_width(range = c(0.1, 3)) +
       geom_node_point(aes(color = District, size = betweenness)) +
-      geom_node_text(aes(label = Characters), size = 4)+
+      geom_node_text(aes(label = Characters), color = "lightblue", size = 4)+
       theme_void() +
+      graph_theme +
       labs(title = paste("Betweenness Centrality Without", input$remove_char),
            color = "District",
            size = "Betweenness")
@@ -256,6 +306,7 @@ output$degree_scatter <- renderPlot({
       geom_col(position = "dodge") +
       coord_flip() +
       theme_minimal() +
+      chart_theme +
       labs(x     = "District",
            y     = "Average Degree",
            fill  = "Type",
@@ -289,29 +340,31 @@ output$degree_scatter <- renderPlot({
                               fill = Characters)) +
       geom_col(position = "dodge", width = 0.5) +
       theme_minimal() +
+      chart_theme +
       labs(x     = "Degree Type",
            y     = "Value",
            fill  = "Character",
            title = paste("Katniss vs", input$compare_char, ": In vs Out Degree"))
   })
-  #card 6
+  #card 
   output$katniss_stats <- renderPrint({
     characters_df <- network() |>
       activate(nodes) |>
       as_tibble() |>
       filter(Characters %in% c("Katniss", input$compare_char)) |>
-      select(Characters, indegree, outdegree, betweenness)
+      select(Characters, indegree, outdegree, betweenness, closeness)
     
     for (i in 1:nrow(characters_df)) {
       cat("Character:             ", characters_df$Characters[i], "\n")
       cat("In-Degree:             ", characters_df$indegree[i], "\n")
       cat("Out-Degree:            ", characters_df$outdegree[i], "\n")
       cat("Betweenness Centrality:", round(characters_df$betweenness[i], 4), "\n")
+      cat("Closeness Centrality:  ", round(characters_df$closeness[i], 4), "\n")
       cat("-----------------------------------\n")
     }
   })
-# we're going to use another example network like from above but visNetwork requires separate edge and nodes lists 
-#card6
+
+#card
   observe({
     char_names <- network() |>
       activate(nodes) |>
@@ -339,6 +392,7 @@ output$degree_scatter <- renderPlot({
                               fill = Characters)) +
       geom_col(position = "dodge", width = 0.5) +
       theme_minimal() +
+      chart_theme +
       labs(x     = "Degree Type",
            y     = "Value",
            fill  = "Character",
@@ -350,13 +404,14 @@ output$degree_scatter <- renderPlot({
       activate(nodes) |>
       as_tibble() |>
       filter(Characters %in% c("Pres Snow", input$compare_snow)) |>
-      select(Characters, indegree, outdegree, betweenness)
+      select(Characters, indegree, outdegree, betweenness, closeness)
     
     for (i in 1:nrow(characters_df)) {
       cat("Character:             ", characters_df$Characters[i], "\n")
       cat("In-Degree:             ", characters_df$indegree[i], "\n")
       cat("Out-Degree:            ", characters_df$outdegree[i], "\n")
       cat("Betweenness Centrality:", round(characters_df$betweenness[i], 4), "\n")
+      cat("Closeness Centrality:  ", round(characters_df$closeness[i], 4), "\n")
       cat("-----------------------------------\n")
     }
   })
