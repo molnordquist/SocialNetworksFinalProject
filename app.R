@@ -38,16 +38,32 @@ ui <-fluidPage(
                 "This project is focused on the gossip network in Catching Fire.
                  Connections exist between characters when they reference each other
                  in conversation. The goal is to analyze who is talked about the most, in the movie to be able to determine which characters are most central to conversations about rebellion and information flow, and who holds the most influence.Centrality measures and in-degree/out-degree
-                 measures will be used to allow users to make insights to what they see to be as powerful/influential in rebellion  
-                The attributes between each character includes district characters are from, role they have in movie, such as tribute, president, family, etc, and gender. 
-                Districts can give insight into power dynamics and information spread.", 
-                card_header("Nodes and edges"), 
-                "Nodes are defined to be characters mentioned by other characters in conversation.", br(),  
+                 measures will be used to allow users to make insights to what they see to be as powerful/influential in rebellion  ", 
+                card_header("About the Data and Network"), 
+                "The data was collected scene by scene. A scene was defined
+by a continuous segment with no cutting. A character’s conversation was classified as dialogue
+between at least two characters within one scene. In each scene, dialogue was analyzed to
+identify when one character referred to another. A directed edge was created from character A to
+character B when character A referred to character B as the subject of dialogue. References were
+counted when a character’s name was used or when a clear descriptor of a character was used.
+To avoid overcounting, each source-target edge was recorded only once per scene. If a character
+referred to the same character multiple times in a scene, it was only counted once. If the same
+reference occurred in a different scene, it was counted again. Directly addressing another
+character (ex: Katniss yelling Peeta’s name) was not counted unless that character was being
+discussed as a topic.", br(),
+                "Each node represents all the characters that appear on screen or are clearly
+referenced in dialogue. The character is then represented with the district they are originally
+from. The character’s role in the movie is attributed to them, such as being a tribute in the games,
+a mentor, a stylist, a game maker, part of the Hunger Games production team, the president of
+Panem, or just a family member or friend of the main characters. Gender is also noted" , br(),
                 "Edges are defined to be references within conversation to the other character." , br(),  
-                "Edge weight was found by adding one when Character A references Character B in conversation on screen.", br(), 
-                "Node attributes include district that a character belongs to, meaning where they live, along with gender of character, and role in movie." , br(), 
+                "The weight represents the number of scenes that
+the source character talks about the target. An edge weight of one is added for each new scene in
+which the source character refers to the target character. If a character refers to the same
+individual multiple times in a scene, it only counts as one weight, as edge weight is only added
+once per scene.", br(),
                 "This is a weighted, directed network.", 
-                card_header("Before jumping into the website, here are some facts to keep in mind:", br(), 
+                card_header("Before jumping into the website, here are some facts to keep in mind:", br(), br(),
                             "Katniss is the main character of this story. She lives in District 12. The capitol is where the president 
                             lives and all the upperclass citizens. The Hunger games is hosted by the capitol where the tributes for the 
                             games are from the 12 districts.", br(),
